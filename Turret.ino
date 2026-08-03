@@ -2,8 +2,6 @@
 
 #include <ESP32Servo.h>
 
-
-
 const int PIN_STEP_IN1 = 14;
 const int PIN_STEP_IN2 = 27;
 const int PIN_STEP_IN3 = 26;
@@ -94,8 +92,12 @@ float stepsToDeg(long steps) {
 }
 
 void panToDeg(float deg) {
-  if (deg < PAN_MIN_DEG) deg = PAN_MIN_DEG;
-  if (deg > PAN_MAX_DEG) deg = PAN_MAX_DEG;
+  if (deg < PAN_MIN_DEG) {
+    deg = PAN_MIN_DEG;
+  }
+  if (deg > PAN_MAX_DEG) {
+    deg = PAN_MAX_DEG;
+  }
 
   long target = degToSteps(deg);
   stepBy(target - panSteps);
@@ -107,8 +109,12 @@ float panCurrentDeg() {
 
 
 void tiltTo(int deg) {
-  if (deg < TILT_MIN_DEG) deg = TILT_MIN_DEG;
-  if (deg > TILT_MAX_DEG) deg = TILT_MAX_DEG;
+  if (deg < TILT_MIN_DEG) {
+    deg = TILT_MIN_DEG;
+  }
+  if (deg > TILT_MAX_DEG) {
+    deg = TILT_MAX_DEG;
+  }
 
   tiltAngle = deg;
   tiltServo.write(tiltAngle);
@@ -124,10 +130,14 @@ float pingOnce() {
   digitalWrite(PIN_TRIG, LOW);
 
   unsigned long dur = pulseIn(PIN_ECHO, HIGH, ECHO_TIMEOUT_US);
-  if (dur == 0) return DIST_INVALID;          
+  if (dur == 0) {
+    return DIST_INVALID;
+  }
 
   float cm = (dur * speedOfSound_cm_us) / 2.0;
-  if (cm < DIST_MIN_CM || cm > DIST_MAX_CM) return DIST_INVALID;
+  if (cm < DIST_MIN_CM || cm > DIST_MAX_CM) {
+    return DIST_INVALID;
+  }
   return cm;
 }
 
@@ -137,8 +147,12 @@ float pingMedian3() {
   float c = pingOnce(); delay(PING_SETTLE_MS);
 
   if (a == DIST_INVALID || b == DIST_INVALID || c == DIST_INVALID) {
-    if (a != DIST_INVALID) return a;
-    if (b != DIST_INVALID) return b;
+    if (a != DIST_INVALID) {
+      return a;
+    }
+    if (b != DIST_INVALID) {
+      return b;
+    }
     return c;
   }
 
@@ -173,8 +187,12 @@ void testUltrasonic() {
   Serial.println(F("\n-- ultrasonic: 10 readings"));
   for (int i = 0; i < 10; i++) {
     float d = pingMedian3();
-    if (d == DIST_INVALID) Serial.println(F("   out of range"));
-    else                   Serial.printf("   %.1f cm\n", d);
+    if (d == DIST_INVALID) {
+      Serial.println(F("   out of range"));
+    }
+    else {
+      Serial.printf("   %.1f cm\n", d);
+    }
   }
 }
 
@@ -227,10 +245,20 @@ void loop() {
   float d = pingMedian3();
 
   Serial.printf("pan=%6.1f  tilt=%3d  ", deg, tiltAngle);
-  if (d == DIST_INVALID) Serial.println(F("dist=  ---"));
-  else                   Serial.printf("dist=%6.1f cm\n", d);
+  if (d == DIST_INVALID) {
+    Serial.println(F("dist=  ---"));
+  }
+  else {
+    Serial.printf("dist=%6.1f cm\n", d);
+  }
 
   deg += STEP_DEG * dir;
-  if (deg > PAN_MAX_DEG) { deg = PAN_MAX_DEG; dir = -1; }
-  if (deg < PAN_MIN_DEG) { deg = PAN_MIN_DEG; dir =  1; }
+  if (deg > PAN_MAX_DEG) {
+    deg = PAN_MAX_DEG;
+    dir = -1;
+  }
+  if (deg < PAN_MIN_DEG) {
+    deg = PAN_MIN_DEG;
+    dir = 1;
+  }
 }
